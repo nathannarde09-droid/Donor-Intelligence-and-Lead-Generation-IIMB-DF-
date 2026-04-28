@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Donor Intelligence</title>
+<title>Donor Intelligence — IIMB</title>
 <style>
 body { font-family: Arial; background:#f5f4f0; padding:40px;}
-.container { max-width:700px; margin:auto;}
+.container { max-width:800px; margin:auto;}
 .card { background:#fff; padding:20px; border-radius:10px; margin-bottom:15px;}
-button { background:#111; color:#fff; padding:10px 16px; border:none; border-radius:6px; cursor:pointer;}
-input { width:100%; padding:10px; margin-bottom:10px;}
+textarea, input { width:100%; padding:10px; margin-bottom:10px;}
+button { background:#111; color:#fff; padding:10px; border:none; border-radius:6px;}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h2>Donor Intelligence</h2>
+<h2>IIMB Donor Intelligence Tool</h2>
 
 <div class="card">
-<p>Enter guest name</p>
-<input type="text" id="name" placeholder="e.g. Rohini Nilekani">
-<button onclick="generate()">Generate brief</button>
+<input id="name" placeholder="Donor name">
+
+<textarea id="info" rows="6" placeholder="Paste donor info (bio, GivingPi, article)"></textarea>
+
+<textarea id="givingpi" rows="4" placeholder="Paste GivingPi description (optional)"></textarea>
+
+<button onclick="generate()">Generate Brief</button>
 </div>
 
 <div id="output"></div>
@@ -30,27 +33,56 @@ input { width:100%; padding:10px; margin-bottom:10px;}
 <script>
 function generate() {
   const name = document.getElementById("name").value;
+  const info = document.getElementById("info").value.toLowerCase();
+  const gp = document.getElementById("givingpi").value;
 
-  if (!name) return;
+  if (!name || !info) return;
 
-  const html = `
+  let capacity = "Medium";
+  if (info.includes("foundation") || info.includes("philanthropy")) capacity = "High";
+  if (info.includes("ceo") || info.includes("investor")) capacity = "High";
+
+  let fit = "General alignment with education and institutional development.";
+  if (info.includes("education")) fit = "Strong alignment with IIMB’s multidisciplinary education initiative.";
+  if (info.includes("startup")) fit = "Alignment with NSRCEL and entrepreneurship ecosystem.";
+
+  const message = `
+Hi ${name},
+
+I came across your work and wanted to reach out.
+
+At IIM Bangalore, we are building a new undergraduate School of Multidisciplinary Studies — India's first liberal arts programme within a public institution at scale.
+
+We saw over 12,000 applications for our first cohort, reflecting strong demand.
+
+We are building this through philanthropic partnerships and would value your perspective in shaping this initiative.
+
+Would love to connect briefly or host you on campus.
+
+Warm regards,  
+Nathan
+`;
+
+  document.getElementById("output").innerHTML = `
   <div class="card">
     <h3>${name}</h3>
-    <p><strong>Estimated Capacity:</strong> ₹50L+/year</p>
-    <p><strong>Signal:</strong> GivingPi member / ecosystem participant</p>
-    <p><strong>IIMB Alignment:</strong> Scholarships, research, entrepreneurship (NSRCEL)</p>
-    <p><strong>LinkedIn:</strong> Search "${name} LinkedIn"</p>
+    <p><strong>Giving Capacity:</strong> ${capacity}</p>
+    <p><strong>Fit with IIMB:</strong> ${fit}</p>
+
     <hr>
+
+    <p><strong>Summary:</strong></p>
+    <p>${info.slice(0,300)}...</p>
+
+    <p><strong>GivingPi Insight:</strong></p>
+    <p>${gp || "Not provided"}</p>
+
+    <hr>
+
     <p><strong>Outreach Message:</strong></p>
-    <p>
-    Hi ${name}, I came across your work via GivingPi and was particularly interested in your contributions to the ecosystem.
-    At IIM Bangalore Development Foundation, we’re building long-term initiatives across research and entrepreneurship.
-    Would love to connect for a quick 20-min conversation to explore alignment.
-    </p>
+    <pre>${message}</pre>
   </div>
   `;
-
-  document.getElementById("output").innerHTML = html;
 }
 </script>
 
